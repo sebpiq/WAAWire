@@ -32,6 +32,32 @@ describe('WAAConnector', function() {
       )
     })
 
+    it('should work with AudioParam', function(done) {
+      var modulator, carrier, gainNode, connector
+      utils.expectSamples(
+        function(context) {
+          gainNode = context.createGain()
+          gainNode.connect(context.destination)
+          
+          modulator = new WAAOffset(context)
+          modulator.offset.setValueAtTime(0.11, 0)
+          connector = new WAAConnector(context, modulator)
+
+          carrier = new WAAOffset(context)
+          carrier.connect(gainNode)
+          carrier.offset.setValueAtTime(2, 0)
+
+          connector.connect(5 * 1 / 44100, gainNode.gain, 0, 0)
+          gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
+        },
+        [
+          [2, 2, 2, 2, 2, 0.22, 0.22, 0.22, 0.22, 0.22],
+          [2, 2, 2, 2, 2, 0.22, 0.22, 0.22, 0.22, 0.22]
+        ],
+        done
+      )
+    })
+
   })
 
   describe('disconnect', function() {
@@ -106,6 +132,36 @@ describe('WAAConnector', function() {
         done
       )
     })
+
+    it('should disconnect also AudioParam', function(done) {
+      var modulator, carrier, gainNode, connector
+      utils.expectSamples(
+        function(context) {
+          gainNode = context.createGain()
+          gainNode.connect(context.destination)
+          
+          modulator = new WAAOffset(context)
+          modulator.offset.setValueAtTime(0.11, 0)
+          connector = new WAAConnector(context, modulator)
+
+          carrier = new WAAOffset(context)
+          carrier.connect(gainNode)
+          carrier.offset.setValueAtTime(2, 0)
+
+          connector.connect(5 * 1 / 44100, gainNode.gain, 0, 0)
+          gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
+
+          connector.disconnect(8 * 1 / 44100, gainNode.gain, 0, 0)
+          gainNode.gain.setValueAtTime(1, 8 * 1 / 44100)
+        },
+        [
+          [2, 2, 2, 2, 2, 0.22, 0.22, 0.22, 2, 2],
+          [2, 2, 2, 2, 2, 0.22, 0.22, 0.22, 2, 2]
+        ],
+        done
+      )
+    })
+
 
   })
 
