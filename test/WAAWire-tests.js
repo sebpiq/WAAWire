@@ -1,7 +1,7 @@
 var assert = require('assert')
   , utils = require('waatest').utils
   , WAAOffset = require('waaoffset')
-  , WAAConnector = require('../index')
+  , WAAWire = require('../index')
 
 var generateBuffer = function(context) {
   var buffer = context.createBuffer(2, 10, context.sampleRate)
@@ -11,7 +11,7 @@ var generateBuffer = function(context) {
   return buffer
 }
 
-describe('WAAConnector', function() {
+describe('WAAWire', function() {
   
   describe('connect', function() {
 
@@ -20,7 +20,7 @@ describe('WAAConnector', function() {
       utils.expectSamples(
         function(context) {
           offsetNode = new WAAOffset(context)
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
           offsetNode.offset.setValueAtTime(0.88, 0)
           connector.connect(offsetNode, context.destination)
         },
@@ -37,7 +37,7 @@ describe('WAAConnector', function() {
       utils.expectSamples(
         function(context) {
           offsetNode = new WAAOffset(context)
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
           offsetNode.offset.setValueAtTime(0.88, 0)
           connector.atTime(5 * 1 / 44100).connect(offsetNode, context.destination)
         },
@@ -58,7 +58,7 @@ describe('WAAConnector', function() {
           
           modulator = new WAAOffset(context)
           modulator.offset.setValueAtTime(0.11, 0)
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
 
           carrier = new WAAOffset(context)
           carrier.connect(gainNode)
@@ -85,7 +85,7 @@ describe('WAAConnector', function() {
         function(context) {
           offsetNode1 = new WAAOffset(context)
           offsetNode2 = new WAAOffset(context)
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
           offsetNode1.offset.setValueAtTime(0.88, 0)
           offsetNode2.offset.setValueAtTime(0.33, 0)
           connector.atTime(5 * 1 / 44100).connect(offsetNode1, context.destination)
@@ -117,7 +117,7 @@ describe('WAAConnector', function() {
           gainNode2.gain.value = 3
           gainNode2.connect(context.destination)
           
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
           connector.connect(offsetNode, gainNode1)
           connector.atTime(7 * 1 / 44100).swapDestination(gainNode2)
         },
@@ -146,8 +146,8 @@ describe('WAAConnector', function() {
           bufferNode.connect(channelSplitter)
           bufferNode.start(0)
 
-          connector1 = new WAAConnector(context)
-          connector2 = new WAAConnector(context)
+          connector1 = new WAAWire(context)
+          connector2 = new WAAWire(context)
 
           connector1.atTime(2 * 1 / 44100).connect(channelSplitter, channelMerger, 0, 0)
           connector2.atTime(4 * 1 / 44100).connect(channelSplitter, channelMerger, 1, 1)
@@ -171,7 +171,7 @@ describe('WAAConnector', function() {
           
           modulator = new WAAOffset(context)
           modulator.offset.setValueAtTime(0.11, 0)
-          connector = new WAAConnector(context)
+          connector = new WAAWire(context)
 
           carrier = new WAAOffset(context)
           carrier.connect(gainNode)

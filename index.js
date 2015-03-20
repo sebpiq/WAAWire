@@ -1,3 +1,3 @@
-var WAAConnector = require('./lib/WAAConnector')
-module.exports = WAAConnector
-if (typeof window !== 'undefined') window.WAAConnector = WAAConnector
+var WAAWire = require('./lib/WAAWire')
+module.exports = WAAWire
+if (typeof window !== 'undefined') window.WAAWire = WAAWire

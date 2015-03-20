@@ -1,1 +1,1 @@
-require('./WAAConnector-tests')
+require('./WAAWire-tests')

@@ -1,16 +1,16 @@
 {
-  "name": "waaconnector",
+  "name": "waawire",
   "version": "0.1.0",
   "description": "More flexible audio node connections and disconnections.",
   "main": "index.js",
   "scripts": {
-    "build": "browserify index.js > dist/WAAConnector-latest.js",
+    "build": "browserify index.js > dist/WAAWire-latest.js",
     "tests.init": "node node_modules/waatest/bin/scaffold waatest; npm run tests.build",
     "tests.build": "browserify index.js > waatest/lib-build.js ; browserify test/index.js > waatest/test-build.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sebpiq/WAAConnector.git"
+    "url": "https://github.com/sebpiq/WAAWire.git"
   },
   "keywords": [
     "audio",
@@ -21,12 +21,9 @@
   "author": "Sébastien Piquemal <sebpiq@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sebpiq/WAAConnector/issues"
+    "url": "https://github.com/sebpiq/WAAWire/issues"
   },
-  "homepage": "https://github.com/sebpiq/WAAConnector",
-  "dependencies": {
-    "lodash.isnumber": "^3.0.0"
-  },
+  "homepage": "https://github.com/sebpiq/WAAWire",
   "devDependencies": {
     "mocha": "2.0.x",
     "browserify": "7.0.x",
