@@ -4,8 +4,9 @@
   "description": "More flexible audio node connections and disconnections.",
   "main": "index.js",
   "scripts": {
-    "build": "browserify index.js > dist/latest-build.js; browserify index.js > test/latest-build.js",
-    "build.tests": "node node_modules/waatest/bin/scaffold waatest; browserify index.js > waatest/lib-build.js ; browserify test/index.js > waatest/test-build.js"
+    "build": "browserify index.js > dist/WAAConnector-latest.js",
+    "tests.init": "node node_modules/waatest/bin/scaffold waatest; npm run tests.build",
+    "tests.build": "browserify index.js > waatest/lib-build.js ; browserify test/index.js > waatest/test-build.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "mocha": "2.0.x",
     "browserify": "7.0.x",
+    "waaoffset": "*",
     "waatest": "git://github.com/sebpiq/WAATest.git#master"
   }
 }
