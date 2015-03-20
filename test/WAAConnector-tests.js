@@ -15,6 +15,23 @@ describe('WAAConnector', function() {
   
   describe('connect', function() {
 
+    it('should just connect the node straight away', function(done) {
+      var offsetNode, connector
+      utils.expectSamples(
+        function(context) {
+          offsetNode = new WAAOffset(context)
+          connector = new WAAConnector(context, offsetNode)
+          offsetNode.offset.setValueAtTime(0.88, 0)
+          connector.connect(context.destination, 0, 0)
+        },
+        [
+          [0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88],
+          [0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88]
+        ],
+        done
+      )
+    })
+
     it('should connect the node at the given time', function(done) {
       var offsetNode, connector
       utils.expectSamples(
@@ -22,7 +39,7 @@ describe('WAAConnector', function() {
           offsetNode = new WAAOffset(context)
           connector = new WAAConnector(context, offsetNode)
           offsetNode.offset.setValueAtTime(0.88, 0)
-          connector.connect(5 * 1 / 44100, context.destination, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(context.destination, 0, 0)
         },
         [
           [0, 0, 0, 0, 0, 0.88, 0.88, 0.88, 0.88, 0.88],
@@ -47,7 +64,7 @@ describe('WAAConnector', function() {
           carrier.connect(gainNode)
           carrier.offset.setValueAtTime(2, 0)
 
-          connector.connect(5 * 1 / 44100, gainNode.gain, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(gainNode.gain, 0, 0)
           gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
         },
         [
@@ -76,10 +93,10 @@ describe('WAAConnector', function() {
           bufferNode.start(0)
 
           connector = new WAAConnector(context, channelSplitter)
-          connector.connect(2 * 1 / 44100, channelMerger, 0, 0)
-          connector.connect(4 * 1 / 44100, channelMerger, 1, 1)
+          connector.atTime(2 * 1 / 44100).connect(channelMerger, 0, 0)
+          connector.atTime(4 * 1 / 44100).connect(channelMerger, 1, 1)
 
-          connector.disconnect(8 * 1 / 44100, channelMerger, 0, 0)
+          connector.atTime(8 * 1 / 44100).disconnect(channelMerger, 0, 0)
         },
         [
           [0, 0, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0, 0],
@@ -103,10 +120,10 @@ describe('WAAConnector', function() {
           bufferNode.start(0)
 
           connector = new WAAConnector(context, channelSplitter)
-          connector.connect(2 * 1 / 44100, channelMerger, 0, 0)
-          connector.connect(4 * 1 / 44100, channelMerger, 1, 1)
+          connector.atTime(2 * 1 / 44100).connect(channelMerger, 0, 0)
+          connector.atTime(4 * 1 / 44100).connect(channelMerger, 1, 1)
 
-          connector.disconnect(8 * 1 / 44100, channelMerger)
+          connector.atTime(8 * 1 / 44100).disconnect(channelMerger)
         },
         [
           [0, 0, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0, 0],
@@ -123,7 +140,7 @@ describe('WAAConnector', function() {
           offsetNode = new WAAOffset(context)
           connector = new WAAConnector(context, offsetNode)
           offsetNode.offset.setValueAtTime(0.88, 0)
-          connector.connect(5 * 1 / 44100, context.destination, 0, 0).close(8 * 1 / 44100)
+          connector.atTime(5 * 1 / 44100).connect(context.destination, 0, 0).close(8 * 1 / 44100)
         },
         [
           [0, 0, 0, 0, 0, 0.88, 0.88, 0.88, 0, 0],
@@ -148,10 +165,10 @@ describe('WAAConnector', function() {
           carrier.connect(gainNode)
           carrier.offset.setValueAtTime(2, 0)
 
-          connector.connect(5 * 1 / 44100, gainNode.gain, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(gainNode.gain, 0, 0)
           gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
 
-          connector.disconnect(8 * 1 / 44100, gainNode.gain, 0, 0)
+          connector.atTime(8 * 1 / 44100).disconnect(gainNode.gain, 0, 0)
           gainNode.gain.setValueAtTime(1, 8 * 1 / 44100)
         },
         [
