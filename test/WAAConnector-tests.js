@@ -77,6 +77,60 @@ describe('WAAConnector', function() {
 
   })
 
+  describe('swapSource', function() {
+
+    it('should swap the node at the given time', function(done) {
+      var offsetNode1, offsetNode2, connector
+      utils.expectSamples(
+        function(context) {
+          offsetNode1 = new WAAOffset(context)
+          offsetNode2 = new WAAOffset(context)
+          connector = new WAAConnector(context)
+          offsetNode1.offset.setValueAtTime(0.88, 0)
+          offsetNode2.offset.setValueAtTime(0.33, 0)
+          connector.atTime(5 * 1 / 44100).connect(offsetNode1, context.destination)
+          connector.atTime(7 * 1 / 44100).swapSource(offsetNode2)
+        },
+        [
+          [0, 0, 0, 0, 0, 0.88, 0.88, 0.33, 0.33, 0.33],
+          [0, 0, 0, 0, 0, 0.88, 0.88, 0.33, 0.33, 0.33]
+        ],
+        done
+      )
+    })
+
+  })
+
+  describe('swapDestination', function() {
+
+    it('should swap the node at the given time', function(done) {
+      var offsetNode, gainNode1, gainNode2, connector
+      utils.expectSamples(
+        function(context) {
+          offsetNode = new WAAOffset(context)
+          offsetNode.offset.setValueAtTime(0.11, 0)
+
+          gainNode1 = context.createGain()
+          gainNode1.gain.value = 2
+          gainNode1.connect(context.destination)
+          gainNode2 = context.createGain()
+          gainNode2.gain.value = 3
+          gainNode2.connect(context.destination)
+          
+          connector = new WAAConnector(context)
+          connector.connect(offsetNode, gainNode1)
+          connector.atTime(7 * 1 / 44100).swapDestination(gainNode2)
+        },
+        [
+          [0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.33, 0.33, 0.33],
+          [0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.33, 0.33, 0.33]
+        ],
+        done
+      )
+    })
+
+  })
+
   describe('close', function() {
 
     it('should close the connection at the given time', function(done) {
