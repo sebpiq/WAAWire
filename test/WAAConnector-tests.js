@@ -20,9 +20,9 @@ describe('WAAConnector', function() {
       utils.expectSamples(
         function(context) {
           offsetNode = new WAAOffset(context)
-          connector = new WAAConnector(context, offsetNode)
+          connector = new WAAConnector(context)
           offsetNode.offset.setValueAtTime(0.88, 0)
-          connector.connect(context.destination, 0, 0)
+          connector.connect(offsetNode, context.destination)
         },
         [
           [0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88, 0.88],
@@ -37,9 +37,9 @@ describe('WAAConnector', function() {
       utils.expectSamples(
         function(context) {
           offsetNode = new WAAOffset(context)
-          connector = new WAAConnector(context, offsetNode)
+          connector = new WAAConnector(context)
           offsetNode.offset.setValueAtTime(0.88, 0)
-          connector.atTime(5 * 1 / 44100).connect(context.destination, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(offsetNode, context.destination)
         },
         [
           [0, 0, 0, 0, 0, 0.88, 0.88, 0.88, 0.88, 0.88],
@@ -58,13 +58,13 @@ describe('WAAConnector', function() {
           
           modulator = new WAAOffset(context)
           modulator.offset.setValueAtTime(0.11, 0)
-          connector = new WAAConnector(context, modulator)
+          connector = new WAAConnector(context)
 
           carrier = new WAAOffset(context)
           carrier.connect(gainNode)
           carrier.offset.setValueAtTime(2, 0)
 
-          connector.atTime(5 * 1 / 44100).connect(gainNode.gain, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(modulator, gainNode.gain)
           gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
         },
         [
@@ -77,10 +77,10 @@ describe('WAAConnector', function() {
 
   })
 
-  describe('disconnect', function() {
+  describe('close', function() {
 
-    it('should close the given connection at the given time', function(done) {
-      var bufferNode, channelSplitter, channelMerger, connector
+    it('should close the connection at the given time', function(done) {
+      var bufferNode, channelSplitter, channelMerger, connector1, connector2 
       utils.expectSamples(
         function(context) {
           channelSplitter = context.createChannelSplitter(2)
@@ -92,59 +92,17 @@ describe('WAAConnector', function() {
           bufferNode.connect(channelSplitter)
           bufferNode.start(0)
 
-          connector = new WAAConnector(context, channelSplitter)
-          connector.atTime(2 * 1 / 44100).connect(channelMerger, 0, 0)
-          connector.atTime(4 * 1 / 44100).connect(channelMerger, 1, 1)
+          connector1 = new WAAConnector(context)
+          connector2 = new WAAConnector(context)
 
-          connector.atTime(8 * 1 / 44100).disconnect(channelMerger, 0, 0)
+          connector1.atTime(2 * 1 / 44100).connect(channelSplitter, channelMerger, 0, 0)
+          connector2.atTime(4 * 1 / 44100).connect(channelSplitter, channelMerger, 1, 1)
+
+          connector1.atTime(8 * 1 / 44100).close()
         },
         [
           [0, 0, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0, 0],
           [0, 0, 0, 0, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22]
-        ],
-        done
-      )
-    })
-
-    it('should close all connections for the given destination', function(done) {
-      var bufferNode, channelSplitter, channelMerger, connector
-      utils.expectSamples(
-        function(context) {
-          channelSplitter = context.createChannelSplitter(2)
-          channelMerger = context.createChannelMerger(2)
-          channelMerger.connect(context.destination)
-
-          bufferNode = context.createBufferSource()
-          bufferNode.buffer = generateBuffer(context)
-          bufferNode.connect(channelSplitter)
-          bufferNode.start(0)
-
-          connector = new WAAConnector(context, channelSplitter)
-          connector.atTime(2 * 1 / 44100).connect(channelMerger, 0, 0)
-          connector.atTime(4 * 1 / 44100).connect(channelMerger, 1, 1)
-
-          connector.atTime(8 * 1 / 44100).disconnect(channelMerger)
-        },
-        [
-          [0, 0, 0.11, 0.11, 0.11, 0.11, 0.11, 0.11, 0, 0],
-          [0, 0, 0, 0, 0.22, 0.22, 0.22, 0.22, 0, 0]
-        ],
-        done
-      )
-    })
-
-    it('should be possible to close the connection directly', function(done) {
-      var offsetNode, connector, connection
-      utils.expectSamples(
-        function(context) {
-          offsetNode = new WAAOffset(context)
-          connector = new WAAConnector(context, offsetNode)
-          offsetNode.offset.setValueAtTime(0.88, 0)
-          connector.atTime(5 * 1 / 44100).connect(context.destination, 0, 0).close(8 * 1 / 44100)
-        },
-        [
-          [0, 0, 0, 0, 0, 0.88, 0.88, 0.88, 0, 0],
-          [0, 0, 0, 0, 0, 0.88, 0.88, 0.88, 0, 0]
         ],
         done
       )
@@ -159,16 +117,16 @@ describe('WAAConnector', function() {
           
           modulator = new WAAOffset(context)
           modulator.offset.setValueAtTime(0.11, 0)
-          connector = new WAAConnector(context, modulator)
+          connector = new WAAConnector(context)
 
           carrier = new WAAOffset(context)
           carrier.connect(gainNode)
           carrier.offset.setValueAtTime(2, 0)
 
-          connector.atTime(5 * 1 / 44100).connect(gainNode.gain, 0, 0)
+          connector.atTime(5 * 1 / 44100).connect(modulator, gainNode.gain, 0, 0)
           gainNode.gain.setValueAtTime(0, 5 * 1 / 44100)
 
-          connector.atTime(8 * 1 / 44100).disconnect(gainNode.gain, 0, 0)
+          connector.atTime(8 * 1 / 44100).close()
           gainNode.gain.setValueAtTime(1, 8 * 1 / 44100)
         },
         [
@@ -177,87 +135,6 @@ describe('WAAConnector', function() {
         ],
         done
       )
-    })
-
-
-  })
-
-  describe('_getConnections', function() {
-
-    it('should add new connection if it doesnt exist', function() {
-      var dummySource = {}
-        , dummyDestination1 = {}
-        , dummyDestination2 = {}
-        , connector = new WAAConnector(null, dummySource)
-        , connection1, connection2
-
-      assert.equal(connector._connections.length, 0)
-
-      // Create a new connection
-      connection1 = connector._getConnections(dummyDestination1, 0, 1, true)[0]
-      assert.equal(connector._connections.length, 1)
-      assert.equal(connector._connections[0].destination, dummyDestination1)
-      assert.deepEqual(connector._connections[0].ports, [connection1])
-
-      // Add the same connection again (same instance is returned)
-      assert.equal(connector._getConnections(dummyDestination1, 0, 1, true)[0], connection1)
-      assert.equal(connector._connections.length, 1)
-      assert.deepEqual(connector._connections[0].ports, [connection1])
-      assert.ok(connection1._isNew())
-
-      // Create a new connection with different ports
-      connection2 = connector._getConnections(dummyDestination1, 1, 1, true)[0]
-      assert.equal(connector._connections.length, 1)
-      assert.equal(connector._connections[0].ports.length, 2)
-      assert.deepEqual(connector._connections[0].ports, [connection1, connection2])
-
-      // Create a new connection with different destination
-      connection1 = connector._getConnections(dummyDestination2, 0, 0, true)[0]
-      assert.equal(connector._connections.length, 2)
-      assert.equal(connector._connections[1].destination, dummyDestination2)
-      assert.deepEqual(connector._connections[1].ports, [connection1])
-    })
-
-    it('should return all queried connections', function() {
-      var dummySource = {}
-        , dummyDestination1 = {}
-        , dummyDestination2 = {}
-        , connector = new WAAConnector(null, dummySource)
-        , connection1, connection2, connection3, connection4, connection5
-
-      assert.equal(connector._connections.length, 0)
-
-      // Create connections
-      connection1 = connector._getConnections(dummyDestination1, 0, 0, true)[0]
-      connection2 = connector._getConnections(dummyDestination1, 0, 1, true)[0]
-      connection3 = connector._getConnections(dummyDestination1, 1, 0, true)[0]
-
-      connection4 = connector._getConnections(dummyDestination2, 0, 0, true)[0]
-      connection5 = connector._getConnections(dummyDestination2, 1, 1, true)[0]
-
-      // Query connections by destination
-      assert.deepEqual(connector._getConnections(dummyDestination1), 
-        [connection1, connection2, connection3])
-      assert.deepEqual(connector._getConnections(dummyDestination2),
-        [connection4, connection5])
-
-      // Query output
-      assert.deepEqual(connector._getConnections(null, 0), 
-        [connection1, connection2, connection4])
-      assert.deepEqual(connector._getConnections(null, 1),
-        [connection3, connection5])
-
-      // Query input
-      assert.deepEqual(connector._getConnections(null, null, 0), 
-        [connection1, connection3, connection4])
-      assert.deepEqual(connector._getConnections(null, null, 1),
-        [connection2, connection5])
-
-      // Compound queries
-      assert.deepEqual(connector._getConnections(dummyDestination1, null, 0), 
-        [connection1, connection3])
-      assert.deepEqual(connector._getConnections(dummyDestination1, 0, null),
-        [connection1, connection2])
     })
 
 
