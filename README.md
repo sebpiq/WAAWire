@@ -9,7 +9,7 @@ var context = new AudioContext()
 ```
 
 
-**Disconnect a single connection**, similarly to the [newly specified syntax](http://webaudio.github.io/web-audio-api/#widl-AudioNode-disconnect-void-unsigned-long-output) for `AudioNode.disconnect`.
+**Disconnect a single connection**, providing the same possibilities as the [newly specified syntax](http://webaudio.github.io/web-audio-api/#widl-AudioNode-disconnect-void-unsigned-long-output) for `AudioNode.disconnect`.
 
 ```javascript
 var osc = context.createOscillator()
@@ -29,11 +29,12 @@ wire.atTime(12).close()
 ```
 
 
-**swap a source and / or a destination''
+**swap a source and / or a destination**
 
 ```javascript
-wire.atTime(5).connect(source1, destination)
+wire.atTime(5).connect(source1, destination1)
 wire.atTime(12).swapSource(source2)
+wire.atTime(20).swapSource(destination2)
 ```
 
 
@@ -70,7 +71,7 @@ Closes the connection.
 Schedules an operation to happen at a given time. All the `WAAWire` methods can be chained with this and therefore scheduled in the future. If `time` is older than `context.currentTime`, the operation will be executed immediately. For example :
 
 ```javascript
-# Will connect the nodes at time = 5s and close the connection at time = 12s
+// Will connect the nodes at time = 5s and close the connection at time = 12s
 wire.atTime(5).connect(source, destination)
 wire.atTime(12).close()
 ```
